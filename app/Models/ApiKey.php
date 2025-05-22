@@ -17,14 +17,24 @@ class ApiKey extends Model
         'key',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
+    // Casts (facultatif, mais recommandé si tu veux forcer les types)
+    protected $casts = [
+        'uuid' => 'string',
+        'user_id' => 'integer',
+        'name' => 'string',
+        'key' => 'string',
+    ];
 
-        // Génère une clé aléatoire automatiquement si vide
+    protected static function booted()
+    {
         static::creating(function ($model) {
-            $model->uuid = (string) Str::uuid();
-            $model->key = Str::random(40);
+            if (empty($model->uuid)) {
+                $model->uuid = (string) Str::uuid();
+            }
+
+            if (empty($model->key)) {
+                $model->key = Str::random(40);
+            }
         });
     }
 

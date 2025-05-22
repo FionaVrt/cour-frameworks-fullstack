@@ -2,24 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use Inertia\Inertia;
 use App\Models\ApiKey;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use App\Http\Controllers\Controller;
 
 class ApiKeyController extends Controller
 {
+    // 🔑 Liste des clés API de l'utilisateur
     public function index()
     {
         $apiKeys = ApiKey::where('user_id', auth()->id())->get();
-        return view('dashboard.api-keys.index', compact('apiKeys'));
+
+        return Inertia::render('ApiKeys/Index', [
+            'apiKeys' => $apiKeys,
+        ]);
     }
 
+    
     public function create()
     {
-        return view('dashboard.api-keys.create');
+        return Inertia::render('ApiKeys/Create');
     }
 
+ 
     public function store(Request $request)
     {
         $request->validate([
@@ -36,6 +42,7 @@ class ApiKeyController extends Controller
         return redirect()->route('api-keys.index')->with('success', 'Clé API créée !');
     }
 
+    // ❌ Suppression d'une clé API
     public function destroy(ApiKey $apiKey)
     {
         if ($apiKey->user_id !== auth()->id()) {
@@ -43,6 +50,7 @@ class ApiKeyController extends Controller
         }
 
         $apiKey->delete();
+
         return redirect()->route('api-keys.index')->with('success', 'Clé API supprimée.');
     }
 }
